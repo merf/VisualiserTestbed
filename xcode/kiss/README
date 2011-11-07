@@ -1,0 +1,18 @@
+This block wraps KISS FFT for Cinder. Check out the "kiss" 
+samples in "btrAudioBlocks" for usage. The block itself should
+be cross platform (at least one report of successful usage on
+Mac).
+
+More info here:
+http://bantherewind.com/kissfft-for-cinder
+
+WISH LIST
+
+- XCode sample projects
+
+-----------------------------------------
+
+http://www.bantherewind.com
+http://www.libcinder.org
+
+bantherewind@gmail.com
