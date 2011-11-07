@@ -1,0 +1,23 @@
+# Mac OS X cruft
+*.xcbkptlist
+*.xcuserstate
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.user
+*.pch
+.DS_Store
+xcuserdata
+DerivedData
+boost/
+build/
+lib/libcinder*.a
+lib/cinder*.lib
+
+# Windows cruft
+*.suo
+*.ncb
+*.sdf
+ipch/
+Debug/
+Release/
