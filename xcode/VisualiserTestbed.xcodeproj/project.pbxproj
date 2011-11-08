@@ -25,12 +25,11 @@
 		00C0735D0FF32F8B004801EA /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C073590FF32F8B004801EA /* AudioUnit.framework */; };
 		00C0735E0FF32F8B004801EA /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C0735A0FF32F8B004801EA /* CoreAudio.framework */; };
 		00E0B6150F60DE8F002C8FBD /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E0B6140F60DE8F002C8FBD /* ApplicationServices.framework */; };
-		2864401514641F5600E4EABB /* KaliedoApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2864401214641F5600E4EABB /* KaliedoApp.cpp */; };
-		2864401614641F5600E4EABB /* SoundEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2864401314641F5600E4EABB /* SoundEngine.cpp */; };
 		2864402314641F6400E4EABB /* kiss_fft.c in Sources */ = {isa = PBXBuildFile; fileRef = 2864401B14641F6400E4EABB /* kiss_fft.c */; };
 		2864402414641F6400E4EABB /* kiss_fftr.c in Sources */ = {isa = PBXBuildFile; fileRef = 2864401D14641F6400E4EABB /* kiss_fftr.c */; };
 		2864402514641F6400E4EABB /* README in Resources */ = {isa = PBXBuildFile; fileRef = 2864402014641F6400E4EABB /* README */; };
 		2864402614641F6400E4EABB /* Kiss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2864402214641F6400E4EABB /* Kiss.cpp */; };
+		28B0376A1469B603007EF7C4 /* BeatDetectionApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 28B037691469B603007EF7C4 /* BeatDetectionApp.cpp */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
@@ -38,8 +37,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		005D2F0F1132E7D800BBAC73 /* Kaliedo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kaliedo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		005D2F111132E7D800BBAC73 /* Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info copy.plist"; sourceTree = "<group>"; };
+		005D2F0F1132E7D800BBAC73 /* VisualiserTestbed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VisualiserTestbed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0091D8F80E81B9330029341E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		0097E3E40F3E9819005A4392 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		00C073570FF32F8B004801EA /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -47,12 +45,8 @@
 		00C073590FF32F8B004801EA /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		00C0735A0FF32F8B004801EA /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		00E0B6140F60DE8F002C8FBD /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
-		00F67D5B10055A22003FDFE1 /* Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info copy.plist"; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		2864401214641F5600E4EABB /* KaliedoApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KaliedoApp.cpp; sourceTree = "<group>"; };
-		2864401314641F5600E4EABB /* SoundEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundEngine.cpp; sourceTree = "<group>"; };
-		2864401414641F5600E4EABB /* SoundEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundEngine.h; sourceTree = "<group>"; };
 		2864401A14641F6400E4EABB /* _kiss_fft_guts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _kiss_fft_guts.h; sourceTree = "<group>"; };
 		2864401B14641F6400E4EABB /* kiss_fft.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kiss_fft.c; sourceTree = "<group>"; };
 		2864401C14641F6400E4EABB /* kiss_fft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kiss_fft.h; sourceTree = "<group>"; };
@@ -61,14 +55,14 @@
 		2864401F14641F6400E4EABB /* Kiss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Kiss.h; sourceTree = "<group>"; };
 		2864402014641F6400E4EABB /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		2864402214641F6400E4EABB /* Kiss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Kiss.cpp; sourceTree = "<group>"; };
+		28B037691469B603007EF7C4 /* BeatDetectionApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BeatDetectionApp.cpp; path = ../src/BeatDetectionApp.cpp; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		32CA4F630368D1EE00C91783 /* Kaliedo_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Kaliedo_Prefix.pch; sourceTree = "<group>"; };
 		5323E6B10EAFCA74003A9687 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
 		5323E6B50EAFCA7E003A9687 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		53E3CDFB0E86099300238D2B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Kaliedo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kaliedo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* VisualiserTestbed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VisualiserTestbed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,9 +108,7 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				2864401214641F5600E4EABB /* KaliedoApp.cpp */,
-				2864401314641F5600E4EABB /* SoundEngine.cpp */,
-				2864401414641F5600E4EABB /* SoundEngine.h */,
+				28B037691469B603007EF7C4 /* BeatDetectionApp.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -152,8 +144,8 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D1107320486CEB800E47090 /* Kaliedo.app */,
-				005D2F0F1132E7D800BBAC73 /* Kaliedo.app */,
+				8D1107320486CEB800E47090 /* VisualiserTestbed.app */,
+				005D2F0F1132E7D800BBAC73 /* VisualiserTestbed.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -213,7 +205,6 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				32CA4F630368D1EE00C91783 /* Kaliedo_Prefix.pch */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -222,8 +213,6 @@
 			isa = PBXGroup;
 			children = (
 				8D1107310486CEB800E47090 /* Info.plist */,
-				00F67D5B10055A22003FDFE1 /* Info copy.plist */,
-				005D2F111132E7D800BBAC73 /* Info copy.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -240,9 +229,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		005D2EFC1132E7D800BBAC73 /* Kaliedo_x86_64 */ = {
+		005D2EFC1132E7D800BBAC73 /* VisualiserTestbed_x86_64 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 005D2F0C1132E7D800BBAC73 /* Build configuration list for PBXNativeTarget "Kaliedo_x86_64" */;
+			buildConfigurationList = 005D2F0C1132E7D800BBAC73 /* Build configuration list for PBXNativeTarget "VisualiserTestbed_x86_64" */;
 			buildPhases = (
 				005D2EFD1132E7D800BBAC73 /* Resources */,
 				005D2EFE1132E7D800BBAC73 /* Sources */,
@@ -252,15 +241,15 @@
 			);
 			dependencies = (
 			);
-			name = Kaliedo_x86_64;
+			name = VisualiserTestbed_x86_64;
 			productInstallPath = "$(HOME)/Applications";
 			productName = basicApp;
-			productReference = 005D2F0F1132E7D800BBAC73 /* Kaliedo.app */;
+			productReference = 005D2F0F1132E7D800BBAC73 /* VisualiserTestbed.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8D1107260486CEB800E47090 /* Kaliedo */ = {
+		8D1107260486CEB800E47090 /* VisualiserTestbed */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "Kaliedo" */;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "VisualiserTestbed" */;
 			buildPhases = (
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
@@ -270,10 +259,10 @@
 			);
 			dependencies = (
 			);
-			name = Kaliedo;
+			name = VisualiserTestbed;
 			productInstallPath = "$(HOME)/Applications";
 			productName = basicApp;
-			productReference = 8D1107320486CEB800E47090 /* Kaliedo.app */;
+			productReference = 8D1107320486CEB800E47090 /* VisualiserTestbed.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -281,7 +270,7 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Kaliedo" */;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "VisualiserTestbed" */;
 			compatibilityVersion = "Xcode 3.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -295,8 +284,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8D1107260486CEB800E47090 /* Kaliedo */,
-				005D2EFC1132E7D800BBAC73 /* Kaliedo_x86_64 */,
+				8D1107260486CEB800E47090 /* VisualiserTestbed */,
+				005D2EFC1132E7D800BBAC73 /* VisualiserTestbed_x86_64 */,
 			);
 		};
 /* End PBXProject section */
@@ -331,11 +320,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2864401514641F5600E4EABB /* KaliedoApp.cpp in Sources */,
-				2864401614641F5600E4EABB /* SoundEngine.cpp in Sources */,
 				2864402314641F6400E4EABB /* kiss_fft.c in Sources */,
 				2864402414641F6400E4EABB /* kiss_fftr.c in Sources */,
 				2864402614641F6400E4EABB /* Kiss.cpp in Sources */,
+				28B0376A1469B603007EF7C4 /* BeatDetectionApp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,7 +356,7 @@
 					"../../../lib/libcinder-x86_64_d.a",
 					"-lz",
 				);
-				PRODUCT_NAME = Kaliedo;
+				PRODUCT_NAME = VisualiserTestbed;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -401,7 +389,7 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "../../../lib/libcinder-x86_64.a";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
-				PRODUCT_NAME = Kaliedo;
+				PRODUCT_NAME = VisualiserTestbed;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -417,13 +405,13 @@
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = Kaliedo_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = ../../../lib/libcinder_d.a;
-				PRODUCT_NAME = Kaliedo;
+				PRODUCT_NAME = VisualiserTestbed;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -440,7 +428,7 @@
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = Kaliedo_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -449,7 +437,7 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = ../../../lib/libcinder.a;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
-				PRODUCT_NAME = Kaliedo;
+				PRODUCT_NAME = VisualiserTestbed;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -488,7 +476,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		005D2F0C1132E7D800BBAC73 /* Build configuration list for PBXNativeTarget "Kaliedo_x86_64" */ = {
+		005D2F0C1132E7D800BBAC73 /* Build configuration list for PBXNativeTarget "VisualiserTestbed_x86_64" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				005D2F0D1132E7D800BBAC73 /* Debug */,
@@ -497,7 +485,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "Kaliedo" */ = {
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "VisualiserTestbed" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
@@ -506,7 +494,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Kaliedo" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "VisualiserTestbed" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
