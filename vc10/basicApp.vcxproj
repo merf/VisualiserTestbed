@@ -14,7 +14,7 @@
     <ProjectGuid>{74202EDD-91D2-4D2A-B0B6-355CEB16E6BE}</ProjectGuid>
     <RootNamespace>basicApp</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>Kaliedo</ProjectName>
+    <ProjectName>VisualiserTestbed</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -59,8 +59,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>cinder_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\lib\msw;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cinder_d.lib;QTMLClient.lib;CVClient.lib;QTSClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\lib\msw;..\..\..\..\QuickTimeSDK-7.3\Libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -102,15 +102,13 @@
     <ClCompile Include="..\..\..\blocks\kiss\include\kiss\kiss_fft.c" />
     <ClCompile Include="..\..\..\blocks\kiss\include\kiss\kiss_fftr.c" />
     <ClCompile Include="..\..\..\blocks\kiss\src\Kiss.cpp" />
-    <ClCompile Include="..\src\KaliedoApp.cpp" />
-    <ClCompile Include="..\src\SoundEngine.cpp" />
+    <ClCompile Include="..\src\BeatDetectionApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\blocks\kiss\include\Kiss.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\kiss_fft.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\kiss_fftr.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\_kiss_fft_guts.h" />
-    <ClInclude Include="..\src\SoundEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
