@@ -14,6 +14,10 @@
 
 #include <sys/time.h>
 
+#include "OpenALSample.h"
+
+
+
 // Imports
 using namespace ci;
 using namespace ci::app;
@@ -28,6 +32,9 @@ struct DataItem
 
 const int history_size = 100;
 static int item_index = 0;
+
+static bool write_frames = true;
+
 
 // Main application
 class BeatDetectorApp : public AppBasic 
@@ -77,7 +84,7 @@ void BeatDetectorApp::keyDown(KeyEvent event)
 	}
 }
 static float roto = 0;
-static float rot_inc = 0;
+static float rot_inc = 6.0f;
 
 //*************************************************************************
 void BeatDetectorApp::NextFile()
@@ -97,28 +104,33 @@ void BeatDetectorApp::NextFile()
 	int rand_file = r.nextInt(m_FileList.size());
 	path my_path = m_FileList[rand_file].path();
 	m_CurrentFile = my_path.string();
-	mAudioSource = audio::load(m_CurrentFile);
-	mTrack = audio::Output::addTrack(mAudioSource, false);
-	mTrack->enablePcmBuffering(true);
-	mTrack->play();		
 	
+	if(!write_frames)
+	{
+		mAudioSource = audio::load(m_CurrentFile);
+		mTrack = audio::Output::addTrack(mAudioSource, false);
+		mTrack->enablePcmBuffering(true);
+		mTrack->play();		
+	}
 	//rot_inc = r.nextFloat(1.5f, 30.0f);
 }
 
+static COpenALSample* p_sample = NULL;
+static int samples_per_frame = 44100/30;
+static int curr_sample = 0;
 //*************************************************************************
 void BeatDetectorApp::setup()
-{
-	
+{	
 	// Set up window
-	setWindowSize(600, 600);
+	setWindowSize(640, 480);
 	
 	// Set up OpenGL
 	gl::enableAlphaBlending();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	//glEnable(GL_LINE_SMOOTH);
+	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	
 	setFrameRate(30);
 	
@@ -157,71 +169,98 @@ void BeatDetectorApp::setup()
 	}
 	
 	NextFile();
+	
+	if(write_frames)
+	{
+		COpenALSampleManager::StaticInit();
+		p_sample = COpenALSampleManager::CreateSample(m_CurrentFile);
+	}
 }
 
 //*************************************************************************
 void BeatDetectorApp::update() 
 {
-	
-	// Check if track is playing and has a PCM buffer available
-	if (mTrack->isPlaying() && mTrack->isPcmBuffering())
+	if(write_frames)
 	{
-		
-		// Get buffer
-		mBuffer = mTrack->getPcmBuffer();
-		if (mBuffer && mBuffer->getInterleavedData())
+		if(curr_sample < p_sample->m_SampleCount)
 		{
-			// Get sample count
-			uint32_t mSampleCount = mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mSampleCount;
-			
-			//mSampleCount = 700;
-			
-			if (mSampleCount > 0)
+			// Initialize analyzer, if needed
+			if (!mFftInit)
 			{
+				mFftInit = true;
+				mFft.setDataSize(samples_per_frame);
+			}
+			
+			mFft.setData(p_sample->mp_Buffer + (curr_sample*2));
+			curr_sample += samples_per_frame;
+		}
+		else
+		{
+			quit();
+		}
+	}
+	else
+	{
+		// Check if track is playing and has a PCM buffer available
+		if (mTrack->isPlaying() && mTrack->isPcmBuffering())
+		{
+			
+			// Get buffer
+			mBuffer = mTrack->getPcmBuffer();
+			if (mBuffer && mBuffer->getInterleavedData())
+			{
+				// Get sample count
+				uint32_t mSampleCount = mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mSampleCount;
 				
-				// Initialize analyzer, if needed
-				if (!mFftInit)
+				//mSampleCount = 700;
+				
+				if (mSampleCount > 0)
 				{
-					mFftInit = true;
-					mFft.setDataSize(mSampleCount);
-				}
-				
-				// Analyze data
-				if (mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mData != 0) 
-					mFft.setData(mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mData);
-				
-				if(false)
-				{
-					if (mFftInit)
+					
+					// Initialize analyzer, if needed
+					if (!mFftInit)
 					{
-						// Get data
-						float * freq_data = mFft.getAmplitude();
-						float * amp_data = mFft.getData();
-						int32_t data_size = mFft.getBinSize();
-						
-						float avg_vol = 0;
-						float avg_freq = 0;
-						for (int32_t i = 0; i < data_size; i++) 
+						mFftInit = true;
+						mFft.setDataSize(mSampleCount);
+					}
+					
+					// Analyze data
+					if (mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mData != 0) 
+						mFft.setData(mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mData);
+					
+					if(false)
+					{
+						if (mFftInit)
 						{
-							avg_vol += amp_data[i];
+							// Get data
+							float * freq_data = mFft.getAmplitude();
+							float * amp_data = mFft.getData();
+							int32_t data_size = mFft.getBinSize();
 							
-							// Do logarithmic plotting for frequency domain
-							double mLogSize = log((double)data_size);
-							float x = (float)(log((double)i) / mLogSize) * (double)data_size;
-							float y = math<float>::clamp(freq_data[i] * (x / data_size) * log((double)(data_size - i)), 0.0f, 1.0f);
+							float avg_vol = 0;
+							float avg_freq = 0;
+							for (int32_t i = 0; i < data_size; i++) 
+							{
+								avg_vol += amp_data[i];
+								
+								// Do logarithmic plotting for frequency domain
+								double mLogSize = log((double)data_size);
+								float x = (float)(log((double)i) / mLogSize) * (double)data_size;
+								float y = math<float>::clamp(freq_data[i] * (x / data_size) * log((double)(data_size - i)), 0.0f, 1.0f);
+								
+								avg_freq += y;
+							}
 							
-							avg_freq += y;
+							avg_vol /= data_size;
+							avg_freq /= data_size;
+							
+							m_HitsoryItems[item_index].amp = avg_vol;
+							m_HitsoryItems[item_index].freq = avg_freq;
+							
+							++item_index;
+							
+							item_index = item_index % history_size;
 						}
-						
-						avg_vol /= data_size;
-						avg_freq /= data_size;
-						
-						m_HitsoryItems[item_index].amp = avg_vol;
-						m_HitsoryItems[item_index].freq = avg_freq;
-						
-						++item_index;
-						
-						item_index = item_index % history_size;
 					}
 				}
 			}
@@ -325,10 +364,9 @@ void BeatDetectorApp::draw()
 	static int frame = 0;
 	frame++;
 	
-	static bool write_frames = true;
 	if(write_frames)
 	{
-		writeImage( getHomeDirectory() + "vis_frames" + getPathSeparator() + "saveImage_" + toString( frame ) + ".png", copyWindowSurface() );
+		writeImage( getHomeDirectory() + "vis_frames2" + getPathSeparator() + "saveImage_" + toString( frame ) + ".png", copyWindowSurface() );
 	}
 }
 

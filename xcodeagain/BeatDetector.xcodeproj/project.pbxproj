@@ -18,6 +18,8 @@
 		2834250E1466EB5200D02D20 /* kiss_fftr.c in Sources */ = {isa = PBXBuildFile; fileRef = 283425071466EB5200D02D20 /* kiss_fftr.c */; };
 		283425101466EB5200D02D20 /* Kiss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2834250C1466EB5200D02D20 /* Kiss.cpp */; };
 		28F83ED61469C03C006A4389 /* KissFileSampleApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 28F83ED51469C03C006A4389 /* KissFileSampleApp.cpp */; };
+		28F83EDC1469CBC6006A4389 /* OpenALSample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 28F83EDA1469CBC6006A4389 /* OpenALSample.cpp */; };
+		28F83EE71469CC76006A4389 /* MyOpenALSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = 28F83EE51469CC76006A4389 /* MyOpenALSupport.c */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
@@ -42,6 +44,10 @@
 		283425091466EB5200D02D20 /* Kiss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Kiss.h; sourceTree = "<group>"; };
 		2834250C1466EB5200D02D20 /* Kiss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Kiss.cpp; sourceTree = "<group>"; };
 		28F83ED51469C03C006A4389 /* KissFileSampleApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = KissFileSampleApp.cpp; path = ../src/KissFileSampleApp.cpp; sourceTree = "<group>"; };
+		28F83EDA1469CBC6006A4389 /* OpenALSample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenALSample.cpp; path = ../src/OpenALSample.cpp; sourceTree = "<group>"; };
+		28F83EDB1469CBC6006A4389 /* OpenALSample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenALSample.h; path = ../src/OpenALSample.h; sourceTree = "<group>"; };
+		28F83EE51469CC76006A4389 /* MyOpenALSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MyOpenALSupport.c; path = ../src/MyOpenALSupport.c; sourceTree = "<group>"; };
+		28F83EE61469CC76006A4389 /* MyOpenALSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyOpenALSupport.h; path = ../src/MyOpenALSupport.h; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* BeatDetector_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BeatDetector_Prefix.pch; sourceTree = "<group>"; };
@@ -76,6 +82,10 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				28F83EDA1469CBC6006A4389 /* OpenALSample.cpp */,
+				28F83EE51469CC76006A4389 /* MyOpenALSupport.c */,
+				28F83EE61469CC76006A4389 /* MyOpenALSupport.h */,
+				28F83EDB1469CBC6006A4389 /* OpenALSample.h */,
 				28F83ED51469C03C006A4389 /* KissFileSampleApp.cpp */,
 			);
 			name = Source;
@@ -259,6 +269,8 @@
 				2834250E1466EB5200D02D20 /* kiss_fftr.c in Sources */,
 				283425101466EB5200D02D20 /* Kiss.cpp in Sources */,
 				28F83ED61469C03C006A4389 /* KissFileSampleApp.cpp in Sources */,
+				28F83EDC1469CBC6006A4389 /* OpenALSample.cpp in Sources */,
+				28F83EE71469CC76006A4389 /* MyOpenALSupport.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
