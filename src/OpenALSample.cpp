@@ -204,14 +204,28 @@ bool LoadWavIntoFloatBuffer(const char *file_name, float** p_buff, ci::uint32_t*
 		
 		uint32_t bytes_per_sample = 2;
 		*num_samples = size/bytes_per_sample;
-		
+
+		static bool mono = true;
+
+		if(mono)
+		{ 
+			*num_samples /= 2;
+		}
+				
 		*p_buff = new float[*num_samples];
 		
 		for(uint32_t i=0; i<*num_samples; i++)
 		{
 			//static float mul = 1.0f / (float)0x7fff;
 			static float mul = 0.5f / (float)0x7fff;
-			(*p_buff)[i] = srcBuffer[i] * mul;
+			if(mono)
+			{
+				(*p_buff)[i] = srcBuffer[i*2] * mul;
+			}
+			else
+			{
+				(*p_buff)[i] = srcBuffer[i] * mul;
+			}
 		}
 		
 		//free(p_data);

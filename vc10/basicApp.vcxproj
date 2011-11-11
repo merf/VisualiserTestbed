@@ -48,7 +48,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\blocks\kiss\include;..\..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\..\blocks\kiss\include;..\..\..\include;..\..\..\boost;..\..\..\..\FieldKit.cpp\include\;..\libs\fmodex\include\;..\..\..\..\OpenAL\samples\Framework\Win32\;..\..\..\..\OpenAL\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -72,7 +72,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\..\blocks\kiss\include;..\..\..\include;..\..\..\boost;..\..\..\..\FieldKit.cpp\include\;..\libs\fmodex\include\;..\..\..\..\OpenAL\samples\Framework\Win32\;..\..\..\..\OpenAL\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
@@ -99,16 +99,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.cpp" />
     <ClCompile Include="..\..\..\blocks\kiss\include\kiss\kiss_fft.c" />
     <ClCompile Include="..\..\..\blocks\kiss\include\kiss\kiss_fftr.c" />
     <ClCompile Include="..\..\..\blocks\kiss\src\Kiss.cpp" />
-    <ClCompile Include="..\src\BeatDetectionApp.cpp" />
+    <ClCompile Include="..\src\KissFileSampleApp.cpp" />
+    <ClCompile Include="..\src\OpenALSample.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\Kiss.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\kiss_fft.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\kiss_fftr.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\_kiss_fft_guts.h" />
+    <ClInclude Include="..\src\OpenALSample.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

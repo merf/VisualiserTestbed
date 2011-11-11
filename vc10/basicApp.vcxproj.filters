@@ -27,7 +27,13 @@
     <ClCompile Include="..\..\..\blocks\kiss\src\Kiss.cpp">
       <Filter>Source Files\Kiss</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\BeatDetectionApp.cpp">
+    <ClCompile Include="..\src\OpenALSample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\KissFileSampleApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,6 +49,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\kiss_fftr.h">
       <Filter>Source Files\Kiss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\OpenALSample.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
