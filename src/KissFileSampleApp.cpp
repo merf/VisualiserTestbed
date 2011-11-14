@@ -13,6 +13,7 @@
 #include <boost/filesystem.hpp>
 
 //#include <sys/time.h>
+#include <time.h>
 
 #include "OpenALSample.h"
 
@@ -30,8 +31,10 @@ struct DataItem
 	float freq;
 };
 
-const int history_size = 100;
+const int history_size = 500;
+static int curr_history_item = 0;
 static int item_index = 0;
+static int master_count = 0;
 
 static bool write_frames = false;
 
@@ -57,32 +60,38 @@ public:
 private:
 
 	// Audio file
-	audio::SourceRef mAudioSource;
-	audio::TrackRef mTrack;
-	audio::PcmBuffer32fRef mBuffer;
+	audio::SourceRef		mAudioSource;
+	audio::TrackRef			mTrack;
+	audio::PcmBuffer32fRef	mBuffer;
 
 	// Analyzer
-	bool mFftInit;
-	Kiss mFft;
+	bool					mFftInit;
+	Kiss					mFft;
 
 	typedef std::vector<boost::filesystem::directory_entry> TFileList;
-	TFileList m_FileList;
-	std::string m_CurrentFile;
+	TFileList				m_FileList;
+	std::string				m_CurrentFile;
 	
-	DataItem	m_HitsoryItems[history_size];
+	DataItem				m_HitsoryItems[history_size];
 
 
-	void			AllocFrecDataArrays();
-	void			ChunkFreqData();
+	void					AllocFrecDataArrays();
+	void					ChunkFreqData();
 
-	int				m_NumChunks;
+	int						m_NumChunks;
 
-	float*			mp_ChunkedFreqData;
-	float*			mp_ChunkedAvg;
-	float*			mp_ChunkedMove;
-	int*			mp_ChunkSizes;
+	float*					mp_ChunkedFreqData;
+	float*					mp_ChunkedAvg;
+	float*					mp_ChunkedMove;
 
-	float			m_AvgVolume;
+	float*					mp_TotalMoveHistory;
+	float*					mp_MoveAvgFreqHistory;
+
+	float*					mp_History;
+
+	int*					mp_ChunkSizes;
+
+	float					m_AvgVolume;
 };
 
 //*************************************************************************
@@ -130,10 +139,18 @@ void BeatDetectorApp::Init( uint32_t mSampleCount )
 		mp_ChunkedFreqData = new float[m_NumChunks];
 		mp_ChunkedAvg = new float[m_NumChunks];
 		mp_ChunkedMove = new float[m_NumChunks];
+		mp_TotalMoveHistory = new float[history_size];
+		mp_MoveAvgFreqHistory = new float[history_size];
+		
 		mp_ChunkSizes = new int[m_NumChunks];
+
+		mp_History = new float[m_NumChunks * history_size];
 
 		memset(mp_ChunkedAvg, 0, m_NumChunks * sizeof(float));
 		memset(mp_ChunkedMove, 0, m_NumChunks * sizeof(float));
+		memset(mp_TotalMoveHistory, 0, history_size * sizeof(float));
+		memset(mp_MoveAvgFreqHistory, 0, history_size * sizeof(float));
+		memset(mp_History, 0, m_NumChunks * history_size * sizeof(float));
 
 		int i=0;
 		for(std::vector<int>::iterator it=chunk_sizes.begin(); it != chunk_sizes.end(); ++it, ++i)
@@ -186,10 +203,31 @@ void BeatDetectorApp::ChunkFreqData()
 			mp_ChunkedAvg[i] = mp_ChunkedAvg[i] - mp_ChunkedAvg[i]*one_on_memory_length + mp_ChunkedFreqData[i]*one_on_memory_length;
 		}
 
+		float total_move_for_frame = 0;
+		float average_move_freq = 0;
 		for(int i=0; i<m_NumChunks; i++)
 		{
 			mp_ChunkedMove[i] = math<float>::clamp(mp_ChunkedFreqData[i] - mp_ChunkedAvg[i]);
+			total_move_for_frame += mp_ChunkedMove[i];
+			average_move_freq += mp_ChunkedMove[i] * i;
 		}
+
+		total_move_for_frame /= (float)m_NumChunks;
+		average_move_freq /= (float)m_NumChunks;
+
+		for(int i=0; i<m_NumChunks; i++)
+		{
+			int index = i + curr_history_item * m_NumChunks;
+			mp_History[index] = mp_ChunkedMove[i];
+		}
+
+		mp_TotalMoveHistory[curr_history_item] = total_move_for_frame;
+		mp_MoveAvgFreqHistory[curr_history_item] = average_move_freq;
+
+		curr_history_item++;
+		curr_history_item = curr_history_item % history_size;
+
+		master_count++;
 	}
 }
 
@@ -202,12 +240,19 @@ void BeatDetectorApp::NextFile()
 		mTrack->enablePcmBuffering(false);
 		mTrack->stop();
 	}
-	
-	//timeval time;
-	//gettimeofday(&time, NULL);
-	
+
+#ifdef WIN32
+	time_t now;
+	time(&now);
+	int time_int = (int)now;
+#else
+	timeval now;
+	gettimeofday(&now, NULL);
+	int time_int = now.tv_sec;
+#endif
+
 	Rand r;
-	//r.seed(time.tv_sec);
+	r.seed(time_int);
 	int rand_file = r.nextInt(m_FileList.size());
 	path my_path = m_FileList[rand_file].path();
 	m_CurrentFile = my_path.string();
@@ -317,7 +362,6 @@ void BeatDetectorApp::update()
 		// Check if track is playing and has a PCM buffer available
 		if (mTrack->isPlaying() && mTrack->isPcmBuffering())
 		{
-			
 			// Get buffer
 			mBuffer = mTrack->getPcmBuffer();
 			if (mBuffer && mBuffer->getInterleavedData())
@@ -327,7 +371,6 @@ void BeatDetectorApp::update()
 				
 				if (mSampleCount > 0)
 				{
-					
 					// Initialize analyzer, if needed
 					if (!mFftInit)
 					{
@@ -359,6 +402,36 @@ void BeatDetectorApp::draw()
 	// Check init flag
 	if (mFftInit)
 	{
+		for(int x=0; x<history_size; x++)
+		{
+			int history_index = (x + master_count) % history_size;
+			float x_f = getWindowWidth() * x/(float)history_size;
+			float t_val = mp_TotalMoveHistory[history_index] * 10;
+
+			gl::color(t_val, t_val, t_val, 1);
+
+			float y_f = getWindowHeight() * mp_MoveAvgFreqHistory[history_index];
+
+			gl::drawSolidRect(Rectf(x_f-5, y_f, x_f+5, y_f+5));
+		}
+
+		for(int x=0; x<history_size; x++)
+		{
+			int history_index = (x + master_count) % history_size;
+			for(int y=0; y<m_NumChunks; y++)
+			{
+				float y_f = getWindowHeight() * y/(float)m_NumChunks;
+
+				float x_f = getWindowWidth() * x/(float)history_size;
+				float t_val = mp_History[history_index * m_NumChunks + y] * 1;
+
+				gl::color(hsvToRGB(Vec3f(t_val, 1, t_val)));
+
+				gl::drawSolidRect(Rectf(x_f-2, y_f-2, x_f+2, y_f+2));
+			}
+		}
+
+
 		glEnableClientState( GL_VERTEX_ARRAY );
 		GLfloat* p_verts = new GLfloat[m_NumChunks * 2 * 4];
 		glVertexPointer( 2, GL_FLOAT, 0, p_verts );
