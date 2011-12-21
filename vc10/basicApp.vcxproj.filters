@@ -36,6 +36,9 @@
     <ClCompile Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SoundAnalyzer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\blocks\kiss\include\Kiss.h">
@@ -54,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SoundAnalyzer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

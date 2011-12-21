@@ -105,6 +105,7 @@
     <ClCompile Include="..\..\..\blocks\kiss\src\Kiss.cpp" />
     <ClCompile Include="..\src\KissFileSampleApp.cpp" />
     <ClCompile Include="..\src\OpenALSample.cpp" />
+    <ClCompile Include="..\src\SoundAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\OpenAL\samples\framework\Win32\CWaves.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\kiss_fftr.h" />
     <ClInclude Include="..\..\..\blocks\kiss\include\kiss\_kiss_fft_guts.h" />
     <ClInclude Include="..\src\OpenALSample.h" />
+    <ClInclude Include="..\src\SoundAnalyzer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

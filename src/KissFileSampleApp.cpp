@@ -17,6 +17,8 @@
 
 #include "OpenALSample.h"
 
+#include "SoundAnalyzer.h"
+
 
 
 // Imports
@@ -30,11 +32,6 @@ struct DataItem
 	float amp;
 	float freq;
 };
-
-const int history_size = 500;
-static int curr_history_item = 0;
-static int item_index = 0;
-static int master_count = 0;
 
 static bool write_frames = false;
 
@@ -72,26 +69,6 @@ private:
 	TFileList				m_FileList;
 	std::string				m_CurrentFile;
 	
-	DataItem				m_HitsoryItems[history_size];
-
-
-	void					AllocFrecDataArrays();
-	void					ChunkFreqData();
-
-	int						m_NumChunks;
-
-	float*					mp_ChunkedFreqData;
-	float*					mp_ChunkedAvg;
-	float*					mp_ChunkedMove;
-
-	float*					mp_TotalMoveHistory;
-	float*					mp_MoveAvgFreqHistory;
-
-	float*					mp_History;
-
-	int*					mp_ChunkSizes;
-
-	float					m_AvgVolume;
 };
 
 //*************************************************************************
@@ -110,8 +87,6 @@ void BeatDetectorApp::keyDown(KeyEvent event)
 static float roto = 0;
 static float rot_inc = 6.0f;
 
-const float step_pow = 1.1f;
-
 //*********************************************************************************
 void BeatDetectorApp::Init( uint32_t mSampleCount )
 {
@@ -119,117 +94,10 @@ void BeatDetectorApp::Init( uint32_t mSampleCount )
 	mFft.setDataSize(mSampleCount);
 
 	int num_bins = mFft.getBinSize();
-	int num_bins_for_this_chunk = 0;
-
-	std::vector<int> chunk_sizes;
-
-	int bin_count = 0;
-	for(int i=0; bin_count<num_bins; i++)
-	{
-		num_bins_for_this_chunk = floor(pow(step_pow, i));
-		bin_count += num_bins_for_this_chunk;
-
-		chunk_sizes.push_back(num_bins_for_this_chunk);
-	}
-
-	m_NumChunks = chunk_sizes.size();
-
-	if(m_NumChunks > 0)
-	{
-		mp_ChunkedFreqData = new float[m_NumChunks];
-		mp_ChunkedAvg = new float[m_NumChunks];
-		mp_ChunkedMove = new float[m_NumChunks];
-		mp_TotalMoveHistory = new float[history_size];
-		mp_MoveAvgFreqHistory = new float[history_size];
-		
-		mp_ChunkSizes = new int[m_NumChunks];
-
-		mp_History = new float[m_NumChunks * history_size];
-
-		memset(mp_ChunkedAvg, 0, m_NumChunks * sizeof(float));
-		memset(mp_ChunkedMove, 0, m_NumChunks * sizeof(float));
-		memset(mp_TotalMoveHistory, 0, history_size * sizeof(float));
-		memset(mp_MoveAvgFreqHistory, 0, history_size * sizeof(float));
-		memset(mp_History, 0, m_NumChunks * history_size * sizeof(float));
-
-		int i=0;
-		for(std::vector<int>::iterator it=chunk_sizes.begin(); it != chunk_sizes.end(); ++it, ++i)
-		{
-			mp_ChunkSizes[i] = *it;
-		}
-	}
-
-	m_AvgVolume = 0;
+	CSoundAnalyzer::StaticInit(num_bins);
 }
 
-//*********************************************************************************
-void BeatDetectorApp::ChunkFreqData()
-{
-	if(mFftInit)
-	{
-		float* p_freq_data = mFft.getAmplitude();
-		int num_bins = mFft.getBinSize();
 
-		int chunk_start = 0;
-		for(int i=0; i<m_NumChunks; i++)
-		{
-			int chunk_end = chunk_start + mp_ChunkSizes[i];
-
-			mp_ChunkedFreqData[i] = 0;
-			for(int bin=chunk_start; bin<chunk_end; bin++)
-			{
-				//bottom few bins seem to be garbage
-				//if(bin >= 2)
-				{
-					mp_ChunkedFreqData[i] += p_freq_data[bin];
-				}
-			}
-
-			chunk_start = chunk_end;
-		}
-
-		float* p_amp = mFft.getData();
-		for(int i=0; i<num_bins; ++i)
-		{
-			m_AvgVolume += p_amp[i] * (num_bins - i);
-		}
-
-		m_AvgVolume /= num_bins * num_bins;
-
-		int memory_length = 30;
-		float one_on_memory_length = 1.0f/(float)memory_length;
-		for(int i=0; i<m_NumChunks; i++)
-		{
-			mp_ChunkedAvg[i] = mp_ChunkedAvg[i] - mp_ChunkedAvg[i]*one_on_memory_length + mp_ChunkedFreqData[i]*one_on_memory_length;
-		}
-
-		float total_move_for_frame = 0;
-		float average_move_freq = 0;
-		for(int i=0; i<m_NumChunks; i++)
-		{
-			mp_ChunkedMove[i] = math<float>::clamp(mp_ChunkedFreqData[i] - mp_ChunkedAvg[i]);
-			total_move_for_frame += mp_ChunkedMove[i];
-			average_move_freq += mp_ChunkedMove[i] * i;
-		}
-
-		total_move_for_frame /= (float)m_NumChunks;
-		average_move_freq /= (float)m_NumChunks;
-
-		for(int i=0; i<m_NumChunks; i++)
-		{
-			int index = i + curr_history_item * m_NumChunks;
-			mp_History[index] = mp_ChunkedMove[i];
-		}
-
-		mp_TotalMoveHistory[curr_history_item] = total_move_for_frame;
-		mp_MoveAvgFreqHistory[curr_history_item] = average_move_freq;
-
-		curr_history_item++;
-		curr_history_item = curr_history_item % history_size;
-
-		master_count++;
-	}
-}
 
 //*************************************************************************
 void BeatDetectorApp::NextFile()
@@ -269,7 +137,8 @@ void BeatDetectorApp::NextFile()
 
 static COpenALSample* p_sample = NULL;
 static int samples_per_frame = 44100/30;
-static int curr_sample = 0;
+static unsigned int curr_sample = 0;
+
 //*************************************************************************
 void BeatDetectorApp::setup()
 {	
@@ -284,7 +153,14 @@ void BeatDetectorApp::setup()
 	//glEnable(GL_LINE_SMOOTH);
 	//glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	
-	setFrameRate(30);
+	if(write_frames)
+	{
+		setFrameRate(30);
+	}
+	else
+	{
+		setFrameRate(60);
+	}
 	
 	// Set line color
 	gl::color(Color(1, 1, 1));
@@ -350,7 +226,7 @@ void BeatDetectorApp::update()
 			mFft.setData(p_sample->mp_Buffer + (curr_sample));
 			curr_sample += samples_per_frame;
 
-			ChunkFreqData();
+			CSoundAnalyzer::Get().ProcessData(mFft.getAmplitude(), mFft.getData());
 		}
 		else
 		{
@@ -381,7 +257,7 @@ void BeatDetectorApp::update()
 					if (mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mData != 0) 
 						mFft.setData(mBuffer->getChannelData(CHANNEL_FRONT_LEFT)->mData);
 
-					ChunkFreqData();
+					CSoundAnalyzer::Get().ProcessData(mFft.getAmplitude(), mFft.getData());
 				}
 			}
 		}
@@ -402,78 +278,7 @@ void BeatDetectorApp::draw()
 	// Check init flag
 	if (mFftInit)
 	{
-		for(int x=0; x<history_size; x++)
-		{
-			int history_index = (x + master_count) % history_size;
-			float x_f = getWindowWidth() * x/(float)history_size;
-			float t_val = mp_TotalMoveHistory[history_index] * 10;
-
-			gl::color(t_val, t_val, t_val, 1);
-
-			float y_f = getWindowHeight() * mp_MoveAvgFreqHistory[history_index];
-
-			gl::drawSolidRect(Rectf(x_f-5, y_f, x_f+5, y_f+5));
-		}
-
-		for(int x=0; x<history_size; x++)
-		{
-			int history_index = (x + master_count) % history_size;
-			for(int y=0; y<m_NumChunks; y++)
-			{
-				float y_f = getWindowHeight() * y/(float)m_NumChunks;
-
-				float x_f = getWindowWidth() * x/(float)history_size;
-				float t_val = mp_History[history_index * m_NumChunks + y] * 1;
-
-				gl::color(hsvToRGB(Vec3f(t_val, 1, t_val)));
-
-				gl::drawSolidRect(Rectf(x_f-2, y_f-2, x_f+2, y_f+2));
-			}
-		}
-
-
-		glEnableClientState( GL_VERTEX_ARRAY );
-		GLfloat* p_verts = new GLfloat[m_NumChunks * 2 * 4];
-		glVertexPointer( 2, GL_FLOAT, 0, p_verts );
-
-		for(int i=0; i<m_NumChunks; ++i)
-		{
-			float i_f = i/(float)(m_NumChunks-1);
-			float i_f2 = (i+1)/(float)(m_NumChunks-1);
-
-			p_verts[i*4+0] = (i_f) * getWindowWidth();
-			p_verts[i*4+1] = getWindowHeight() - mp_ChunkedFreqData[i] * getWindowHeight() * 0.5f;
-
-			p_verts[i*4+2] = (i_f) * getWindowWidth();
-			p_verts[i*4+3] = getWindowHeight();
-		}
-
-		gl::color(1,1,1,1);
-
-		glDrawArrays( GL_TRIANGLE_STRIP, 0, m_NumChunks * 4 );
-
-		for(int i=0; i<m_NumChunks; ++i)
-		{
-			float i_f = i/(float)m_NumChunks;
-			//gl::color(hsvToRGB(Vec3f(i_f,1,1)));
-			float w = getWindowWidth()*0.5f/(float)m_NumChunks;
-			float y= getWindowHeight()*0.5f;
-			float h = 1;
-
-			//gl::drawSolidRect(Rectf(i_f*getWindowWidth()-w, y-mp_ChunkedAvg[i]*getWindowHeight()-h, i_f*getWindowWidth()+w, y-mp_ChunkedAvg[i]*getWindowHeight()+h));
-			gl::drawSolidRect(Rectf(i_f*getWindowWidth()-w, getWindowHeight()*0.5f-h, i_f*getWindowWidth()+w, getWindowHeight()*0.5f+h));
-		}
-
-		for(int i=0; i<m_NumChunks; ++i)
-		{
-			float i_f = i/(float)m_NumChunks;
-			gl::color(hsvToRGB(Vec3f(i_f,1,1)));
-			float w = getWindowWidth()*0.5f/(float)m_NumChunks;
-			float y= getWindowHeight()*0.5f;
-			float h = 3;
-
-			gl::drawSolidRect(Rectf(i_f*getWindowWidth()-w, y-mp_ChunkedMove[i]*getWindowHeight()-h, i_f*getWindowWidth()+w, y-mp_ChunkedMove[i]*getWindowHeight()+h));
-		}
+		CSoundAnalyzer::Get().Draw();
 	}
 
 	static int frame = 0;
