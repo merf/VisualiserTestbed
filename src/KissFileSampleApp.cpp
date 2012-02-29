@@ -20,6 +20,10 @@
 #include "SoundAnalyzer.h"
 
 
+#include "cinder/Easing.h"
+#include "cinder/Timeline.h"
+#include <list>
+
 
 // Imports
 using namespace ci;
@@ -27,10 +31,36 @@ using namespace ci::app;
 using namespace cinder::audio;
 using namespace boost::filesystem;
 
+namespace
+{
+	static COpenALSample* p_sample = NULL;
+	static int samples_per_frame = 44100/30;
+	static unsigned int curr_sample = 0;
+}
+
+
 struct DataItem
 {
 	float amp;
 	float freq;
+};
+
+
+class Circle {
+public:
+	Circle( Color color, float radius, Vec2f initialPos )
+		: m_Color( color ), m_Radius( radius ), m_Pos( initialPos )
+	{}
+
+	void draw() const 
+	{
+		gl::color( ColorA( m_Color, 0.75f ) );
+		gl::drawSolidCircle( m_Pos, m_Radius );
+	}
+
+	Anim<Color>			m_Color;
+	Anim<Vec2f>			m_Pos;
+	Anim<float>			m_Radius;
 };
 
 static bool write_frames = false;
@@ -69,6 +99,7 @@ private:
 	TFileList				m_FileList;
 	std::string				m_CurrentFile;
 	
+	std::list<Circle>		m_Cirlces;
 };
 
 //*************************************************************************
@@ -82,6 +113,19 @@ void BeatDetectorApp::keyDown(KeyEvent event)
 		case 'f':
 			setFullScreen(!isFullScreen());
 			break;
+		case 'p':
+			if(mTrack)
+			{
+				if(mTrack->isPlaying())
+				{
+					mTrack->stop();
+				}
+				else
+				{
+					mTrack->play();
+				}
+			}
+			break;
 	}
 }
 static float roto = 0;
@@ -94,7 +138,13 @@ void BeatDetectorApp::Init( uint32_t mSampleCount )
 	mFft.setDataSize(mSampleCount);
 
 	int num_bins = mFft.getBinSize();
-	CSoundAnalyzer::StaticInit(num_bins);
+	CSoundAnalyzer::StaticInit(num_bins, samples_per_frame);
+
+	for(int i=0; i<5; i++)
+	{
+		float i_f = i/(float)5 - 0.4f;
+		m_Cirlces.push_back(Circle(Color(1, 0, 0), 0, Vec2f(0, getWindowHeight() * i_f)));
+	}
 }
 
 
@@ -135,19 +185,19 @@ void BeatDetectorApp::NextFile()
 	//rot_inc = r.nextFloat(1.5f, 30.0f);
 }
 
-static COpenALSample* p_sample = NULL;
-static int samples_per_frame = 44100/30;
-static unsigned int curr_sample = 0;
+
 
 //*************************************************************************
 void BeatDetectorApp::setup()
 {	
+
+
 	// Set up window
 	setWindowSize(480, 480);
 	
 	// Set up OpenGL
 	gl::enableAlphaBlending();
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	//glEnable(GL_LINE_SMOOTH);
@@ -268,7 +318,18 @@ void BeatDetectorApp::update()
 void BeatDetectorApp::draw()
 {
 	// Clear screen
-	gl::clear(Color(0.0f, 0.0f, 0.0f));
+	//gl::clear(ColorA(0.0f, 0.0f, 0.0f, 0.0f));
+
+	// Clear the draw and depth buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Take the contents of the current accumulation buffer and copy it to the colour buffer with each pixel multiplied by a factor
+	// i.e. we clear the screen, draw the last frame again (which we saved in the accumulation buffer), then draw our stuff at its new location on top of that
+	glAccum(GL_RETURN, 0.999f);
+
+	// Clear the accumulation buffer (don't worry, we re-grab the screen into the accumulation buffer after drawing our current frame!)
+	glClear(GL_ACCUM_BUFFER_BIT);
+
 	
 	if(m_CurrentFile != "")
 	{
@@ -279,7 +340,78 @@ void BeatDetectorApp::draw()
 	if (mFftInit)
 	{
 		CSoundAnalyzer::Get().Draw();
+
+		float* p_data = NULL;
+		size_t num_items = 0;
+		CSoundAnalyzer::Get().GetChunkedMoveData(&p_data, num_items);
+
+		glPushMatrix();
+
+		static float time = 0;
+		time += 0.05f;
+
+		/*
+
+		//gl::translate(getWindowWidth() * 0.5f + 0.25f * getWindowWidth() * sin(time), getWindowHeight() * 0.5f);
+		gl::translate(0, getWindowHeight() * 0.5f);
+
+		for(int i=0; i<num_items; ++i)
+		{
+			float f = i/(float)num_items;
+
+			gl::drawLine(Vec2f(getWindowWidth()*f, 0), Vec2f(getWindowWidth()*f, getWindowHeight()*p_data[i]));
+		}
+		*/
+
+		/*
+		//gl::rotate(time * 30);
+
+		const size_t num_bands = 5;
+		float bands[num_bands];
+
+		size_t items_per_band = num_items / num_bands;
+		
+		for(size_t band = 0; band < num_bands; band++)
+		{
+			float max_in_band = 0;
+			for(size_t item = band * items_per_band; item < (band+1) * items_per_band; item++)
+			{
+				if(p_data[item] > max_in_band)
+				{
+					max_in_band = p_data[item];
+				}
+			}
+
+			bands[band] = max_in_band;
+
+
+		}
+		*/
+
+		/*
+		int band = 0;
+		for(std::list<Circle>::iterator it = m_Cirlces.begin(); it != m_Cirlces.end(); ++it)
+		{
+			if(bands[band] > 0.2f)
+			{
+				timeline().apply(&it->m_Radius, 50.0f, 0.05f, cinder::EaseInCubic());
+				timeline().appendTo(&it->m_Radius, 0.0f, 0.7f, cinder::EaseOutCubic());
+				//timeline().appendTo(&it->m_Radius, 1.0f, 0.5f);
+				//timeline().appendTo(&it->m_Radius, 0.0f, 0.2f, cinder::EaseInCubic());
+
+				timeline().apply(&it->m_Color, Color(randFloat(), randFloat(), randFloat()), 1.0f, cinder::EaseOutCubic());
+			}
+			//it->m_Radius = 20 * bands[band++];
+			it->draw();
+
+			band++;
+		}
+		*/
+
+		glPopMatrix();
 	}
+
+	//glAccum(GL_ACCUM, 0.99f);
 
 	static int frame = 0;
 	frame++;

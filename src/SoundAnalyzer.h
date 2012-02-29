@@ -3,10 +3,10 @@
 class CSoundAnalyzer
 {
 public:
-	CSoundAnalyzer(int num_bins);
+	CSoundAnalyzer(int num_bins, int samples_per_frame);
 	~CSoundAnalyzer() {}
 
-	static void				StaticInit(int num_bins);
+	static void				StaticInit(int num_bins, int samples_per_frame);
 
 	static CSoundAnalyzer&	Get() { return *mp_Impl; }
 
@@ -14,11 +14,20 @@ public:
 
 	void					Draw();
 
+	void					GetChunkedMoveData(float** p_data, size_t& num_items);
 private:
 	void					AllocFrecDataArrays();
 
+	int						m_SamplesPerFrame;
+	int						m_WindowsPerFrame;
+
 	int						m_NumBins;
 	int						m_NumChunks;
+
+	float*					mp_AmplitudeData;
+	float*					mp_CarrierWave;
+	float*					mp_RCC;
+	float*					mp_StochasticComponent;
 
 	float*					mp_ChunkedFreqData;
 
