@@ -16,6 +16,9 @@ static int curr_history_item = 0;
 static int item_index = 0;
 static int master_count = 0;
 
+const int NUM_FRAMES_HISTORY = 100;
+static int CurrHistoryIndex = 0;
+
 using namespace ci;
 using namespace ci::app;
 
@@ -46,8 +49,11 @@ m_WindowsPerFrame(10)
 		mp_AmplitudeData = new float[m_SamplesPerFrame];
 		mp_CarrierWave = new float[m_SamplesPerFrame];
 		mp_RCC = new float[m_SamplesPerFrame];
+		mp_RCCDerivs = new float[m_SamplesPerFrame];
 
 		mp_StochasticComponent = new float[m_WindowsPerFrame];
+		mp_StochasticHistory = new float[m_WindowsPerFrame * NUM_FRAMES_HISTORY];
+		//mp_StochasticComponent = new float[m_WindowsPerFrame];
 
 		mp_ChunkedFreqData = new float[m_NumChunks];
 		mp_ChunkedAvg = new float[m_NumChunks];
@@ -152,8 +158,11 @@ void CSoundAnalyzer::ProcessData(float* p_freq_data, float* p_amp_data)
 					float f = (j-previous_midpoint_i)/(float)(midpoint_i-previous_midpoint_i);
 					mp_CarrierWave[j] = lerp(previous_midpoint_a, midpoint_a, f);
 
+					float rise = midpoint_a-previous_midpoint_a;
+					float run = midpoint_i - previous_midpoint_i;
+					mp_RCCDerivs[j] = rise/run;
+
 					mp_RCC[j] = mp_AmplitudeData[j] - mp_CarrierWave[j];
-					//mp_CarrierWave[j] = midpoint_a;
 				}
 
 				previous_midpoint_i = midpoint_i;
@@ -167,23 +176,66 @@ void CSoundAnalyzer::ProcessData(float* p_freq_data, float* p_amp_data)
 		prev_a = a;
 	}
 
-	for(int i=0; i<m_WindowsPerFrame; ++i)
-	{
-		int samples_for_window = m_SamplesPerFrame / m_WindowsPerFrame;
-
-		mp_StochasticComponent[i] = 1 - autocorrelation(samples_for_window, &mp_RCC[i*samples_for_window]);
-	}
-
 	int midpoint_i = m_SamplesPerFrame;
-	float midpoint_a = mp_AmplitudeData[midpoint_i];
+	float midpoint_a = mp_AmplitudeData[midpoint_i-1];
 
 	for(int j=previous_midpoint_i; j<midpoint_i; ++j)
 	{
 		float f = (j-previous_midpoint_i)/(float)(midpoint_i-previous_midpoint_i);
 		mp_CarrierWave[j] = lerp(previous_midpoint_a, midpoint_a, f);
 
+		float rise = midpoint_a-previous_midpoint_a;
+		float run = midpoint_i - previous_midpoint_i;
+		mp_RCCDerivs[j] = rise/run;
+
 		mp_RCC[j] = mp_AmplitudeData[j] - mp_CarrierWave[j];
 	}
+
+	m_SODFrame = 0;
+
+	for(int i=0; i<m_WindowsPerFrame; ++i)
+	{
+		int samples_for_window = m_SamplesPerFrame / m_WindowsPerFrame;
+
+		mp_StochasticComponent[i] = 1 - fabsf(autocorrelation(samples_for_window, &mp_RCC[i*samples_for_window]));
+
+
+		/*
+		//TODO - this is just wrong - should be the sd of the derivative of the rcc - phew!
+		float mean_rcc_for_window = 0;
+		for(int j=0; j<samples_for_window; ++j)
+		{
+			mean_rcc_for_window += mp_RCC[i*samples_for_window + j];
+		}
+		mean_rcc_for_window /= (float)samples_for_window;
+
+		mp_StochasticComponent[i] *= fabsf(mean_rcc_for_window) * 100;
+		*/
+
+		float mean_rcc_deriv_for_window = 0;
+		for(int j=0; j<samples_for_window; ++j)
+		{
+			mean_rcc_deriv_for_window += mp_RCCDerivs[i*samples_for_window + j];
+		}
+		mean_rcc_deriv_for_window /= (float)samples_for_window;
+
+		float noise = 0;
+		for(int j=0; j<samples_for_window; ++j)
+		{
+			noise += (mp_RCCDerivs[i*samples_for_window + j] - mean_rcc_deriv_for_window)*(mp_RCCDerivs[i*samples_for_window + j] - mean_rcc_deriv_for_window);
+		}
+		noise = sqrtf(noise);
+
+		mp_StochasticComponent[i] *= noise;
+
+		m_SODFrame = math<float>::max(mp_StochasticComponent[i], m_SODFrame);
+
+		mp_StochasticHistory[CurrHistoryIndex * m_WindowsPerFrame + i] = mp_StochasticComponent[i];
+		mp_StochasticHistory[i] = mp_StochasticComponent[i];
+	}
+	CurrHistoryIndex = (CurrHistoryIndex+1)%NUM_FRAMES_HISTORY;
+
+	//m_SODFrame /= (float)m_WindowsPerFrame;
 
 	int chunk_start = 0;
 	for(int i=0; i<m_NumChunks; i++)
@@ -248,6 +300,7 @@ void CSoundAnalyzer::Draw()
 
 	gl::drawLine(Vec2f(0, getWindowHeight()*0.5f), Vec2f(getWindowWidth(), getWindowHeight()*0.5f));
 
+
 	gl::color(1,0,0);
 
 	for(int i=0; i<m_SamplesPerFrame; ++i)
@@ -298,6 +351,38 @@ void CSoundAnalyzer::Draw()
 
 	gl::color(1,0,1);
 
+	//for(int i=0; i<m_WindowsPerFrame*NUM_FRAMES_HISTORY; ++i)
+	for(int i=m_WindowsPerFrame*CurrHistoryIndex; i<m_WindowsPerFrame*NUM_FRAMES_HISTORY; ++i)
+	{
+		if(i<m_WindowsPerFrame*NUM_FRAMES_HISTORY-1)
+		{
+			int i0=i;
+			int i1=i+1;
+
+			float f0 = (i0-m_WindowsPerFrame*CurrHistoryIndex) / (float)(m_WindowsPerFrame*NUM_FRAMES_HISTORY - 1);
+			float f1 = (i1-m_WindowsPerFrame*CurrHistoryIndex) / (float)(m_WindowsPerFrame*NUM_FRAMES_HISTORY - 1);
+
+			gl::drawLine(Vec2f(f0*getWindowWidth(), -getWindowHeight()*mp_StochasticHistory[i0]*0.5f), Vec2f(f1*getWindowWidth(), -getWindowHeight()*mp_StochasticHistory[i1]*0.5f));
+		}
+	}
+
+	for(int i=0; i<m_WindowsPerFrame*CurrHistoryIndex; ++i)
+	{
+		if(i<m_WindowsPerFrame*NUM_FRAMES_HISTORY-1)
+		{
+			int i0=i;
+			int i1=i+1;
+
+			float f0 = (i0+m_WindowsPerFrame*NUM_FRAMES_HISTORY-m_WindowsPerFrame*CurrHistoryIndex) / (float)(m_WindowsPerFrame*NUM_FRAMES_HISTORY - 1);
+			float f1 = (i1+m_WindowsPerFrame*NUM_FRAMES_HISTORY-m_WindowsPerFrame*CurrHistoryIndex) / (float)(m_WindowsPerFrame*NUM_FRAMES_HISTORY - 1);
+
+			gl::drawLine(Vec2f(f0*getWindowWidth(), -getWindowHeight()*mp_StochasticHistory[i0]*0.5f), Vec2f(f1*getWindowWidth(), -getWindowHeight()*mp_StochasticHistory[i1]*0.5f));
+		}
+	}
+
+	/*
+	gl::color(0,1,1);
+
 	for(int i=0; i<m_WindowsPerFrame; ++i)
 	{
 		if(i<m_WindowsPerFrame-1)
@@ -305,12 +390,13 @@ void CSoundAnalyzer::Draw()
 			int i0=i;
 			int i1=i+1;
 
-			float f0 = i0 / (float)m_WindowsPerFrame;
-			float f1 = i1 / (float)m_WindowsPerFrame;
+			float f0 = i0 / (float)(m_WindowsPerFrame - 1);
+			float f1 = i1 / (float)(m_WindowsPerFrame - 1);
 
 			gl::drawLine(Vec2f(f0*getWindowWidth(), getWindowHeight()*mp_StochasticComponent[i0]*0.5f), Vec2f(f1*getWindowWidth(), getWindowHeight()*mp_StochasticComponent[i1]*0.5f));
 		}
 	}
+	*/
 
 
 	//glEnableClientState( GL_VERTEX_ARRAY );

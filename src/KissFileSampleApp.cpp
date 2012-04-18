@@ -339,7 +339,7 @@ void BeatDetectorApp::draw()
 	// Check init flag
 	if (mFftInit)
 	{
-		CSoundAnalyzer::Get().Draw();
+		//CSoundAnalyzer::Get().Draw();
 
 		float* p_data = NULL;
 		size_t num_items = 0;
@@ -349,6 +349,11 @@ void BeatDetectorApp::draw()
 
 		static float time = 0;
 		time += 0.05f;
+
+		float f = CSoundAnalyzer::Get().GetSOD();
+
+		gl::color(hsvToRGB(Vec3f(f, 1, 1)));
+		gl::drawSolidCircle(Vec2f(getWindowWidth()*0.5f, getWindowHeight()*0.5f), 200 * f);
 
 		/*
 

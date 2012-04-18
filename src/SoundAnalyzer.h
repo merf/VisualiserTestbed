@@ -15,6 +15,8 @@ public:
 	void					Draw();
 
 	void					GetChunkedMoveData(float** p_data, size_t& num_items);
+
+	float					GetSOD() const { return m_SODFrame; }
 private:
 	void					AllocFrecDataArrays();
 
@@ -27,7 +29,12 @@ private:
 	float*					mp_AmplitudeData;
 	float*					mp_CarrierWave;
 	float*					mp_RCC;
+	float*					mp_RCCDerivs;
 	float*					mp_StochasticComponent;
+
+	float					m_SODFrame;
+
+	float*					mp_StochasticHistory;
 
 	float*					mp_ChunkedFreqData;
 
